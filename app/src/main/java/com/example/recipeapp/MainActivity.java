@@ -1,6 +1,9 @@
 package com.example.recipeapp;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.support.constraint.Constraints;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.example.recipeapp.idlingResource.RecipeListIdlingResource;
 import com.example.recipeapp.model.Recipes;
 import com.example.recipeapp.util.HttpHelper;
 import com.example.recipeapp.util.InternetCheck;
@@ -22,17 +26,19 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements RecipeAdapter.OnRecipeListener{
 
-        private final String recipeJSONurl = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
-
     RecyclerView recyclerView;
     RecipeAdapter recipeAdapter;
     TextView opsTv, noInternetTv;
 
     Button retryBtn;
 
+    @Nullable
+    private RecipeListIdlingResource mIdlingResource;
+
+
     ArrayList<Recipes> recipesList = new ArrayList<>();
 
-    public static final int [] recipesImages ={R.drawable.brownies, R.drawable.chesse_cake, R.drawable.nutella_pie, R.drawable.yellow_cake};
+    public static final int [] recipesImages ={R.drawable.nutella_pie, R.drawable.brownies, R.drawable.yellow_cake, R.drawable.chesse_cake};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +60,7 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.OnR
             }
         });
 
+        String recipeJSONurl = "https://d17h27t6h515a5.cloudfront.net/topher/2017/May/59121517_baking/baking.json";
         getRecipesArray(recipeJSONurl);
 
         recyclerView = findViewById(R.id.recycler_view);
@@ -114,5 +121,14 @@ public class MainActivity extends AppCompatActivity implements RecipeAdapter.OnR
                 }
             }
         }).execute();
+    }
+
+    @VisibleForTesting
+    @NonNull
+    public RecipeListIdlingResource getIdlingResource() {
+        if (mIdlingResource == null) {
+            mIdlingResource = new RecipeListIdlingResource();
+        }
+        return mIdlingResource;
     }
 }
